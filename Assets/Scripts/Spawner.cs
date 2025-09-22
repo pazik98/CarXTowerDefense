@@ -10,7 +10,7 @@ public class Spawner : MonoBehaviour {
 	void Update () {
 		if (Time.time > m_lastSpawn + m_interval) {
 			var newMonster = GameObject.CreatePrimitive (PrimitiveType.Capsule);
-			var r = newMonster.AddComponent<Rigidbody> ();
+			var r = newMonster.AddComponent<Rigidbody>();
 			r.useGravity = false;
 			newMonster.transform.position = transform.position;
 			var monsterBeh = newMonster.AddComponent<Monster> ();

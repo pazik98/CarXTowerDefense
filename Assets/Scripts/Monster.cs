@@ -4,7 +4,7 @@ using System.Collections;
 public class Monster : MonoBehaviour {
 
 	public GameObject m_moveTarget;
-	public float m_speed = 0.1f;
+	public float m_speed = 0.01f;
 	public int m_maxHP = 30;
 	const float m_reachDistance = 0.3f;
 
