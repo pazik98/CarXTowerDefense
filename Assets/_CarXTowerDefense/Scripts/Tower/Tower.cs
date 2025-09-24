@@ -24,6 +24,8 @@ namespace _CarXTowerDefense.Scripts.Tower
         private float _detectionTimer;
         private float _shootTimer;
 
+        protected virtual bool CanShoot => Vector3.Distance(shootPoint.position, Target.position) <= shootRange;
+
         private void Start()
         {
             _detectionTimer = detectionInterval;
@@ -46,7 +48,7 @@ namespace _CarXTowerDefense.Scripts.Tower
             {
                 _shootTimer -= Time.fixedDeltaTime;
             }
-            else if (Target != null && Vector3.Distance(shootPoint.position, Target.position) <= shootRange)
+            else if (Target != null && CanShoot)
             {
                 Shoot();
                 _shootTimer = shootInterval;
