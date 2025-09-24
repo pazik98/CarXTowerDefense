@@ -18,10 +18,10 @@ namespace _CarXTowerDefense.Scripts.Tower
         [SerializeField] protected float detectionRange = 5f;
         [SerializeField] protected float detectionInterval = 0.05f;
         [SerializeField] protected LayerMask enemyLayerMask;
-        
-        protected readonly Collider[] DetectedCollidersBuffer = new Collider[32];
-        protected Transform Target;
 
+        protected Transform Target;
+        
+        private readonly Collider[] _detectedCollidersBuffer = new Collider[32];
         private float _detectionTimer;
         private float _shootTimer;
 
@@ -56,25 +56,20 @@ namespace _CarXTowerDefense.Scripts.Tower
         
         protected virtual void Detect()
         {
-            Array.Clear(DetectedCollidersBuffer, 0, DetectedCollidersBuffer.Length);
-            Physics.OverlapSphereNonAlloc(center.position, detectionRange, DetectedCollidersBuffer, enemyLayerMask);
+            Array.Clear(_detectedCollidersBuffer, 0, _detectedCollidersBuffer.Length);
+            Physics.OverlapSphereNonAlloc(center.position, detectionRange, _detectedCollidersBuffer, enemyLayerMask);
             
             if (Target != null && Vector3.Distance(Target.position, center.position) > detectionRange)
             {
                 Target = null;
             }
             
-            if (Target == null && DetectedCollidersBuffer[0] != null)
+            if (Target == null && _detectedCollidersBuffer[0] != null)
             {
-                Target = DetectedCollidersBuffer[0].transform;
+                Target = _detectedCollidersBuffer[0].transform;
             }
         }
         
         protected abstract void Shoot();
-        
-        private void OnDestroy()
-        {
-            CancelInvoke(nameof(Detect));
-        }
     }
 }
