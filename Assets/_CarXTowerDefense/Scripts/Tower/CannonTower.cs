@@ -28,11 +28,6 @@ namespace _CarXTowerDefense.Scripts.Tower
 
 		protected override void Shoot()
 		{
-			if (Vector3.Distance(shootPoint.position, Target.position) > shootRange)
-			{
-				return;
-			}
-			
 			Instantiate(projectilePrefab, shootPoint.position, shootPoint.rotation); //TODO Pool?
 		}
 		

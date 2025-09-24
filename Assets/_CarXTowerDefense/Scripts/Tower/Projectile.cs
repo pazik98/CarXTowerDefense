@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace _CarXTowerDefense.Scripts.Tower
 {
+    [RequireComponent(typeof(Collider))]
     public abstract class Projectile : MonoBehaviour
     {
         [SerializeField] protected float speed = 0.1f;
@@ -25,5 +26,14 @@ namespace _CarXTowerDefense.Scripts.Tower
         }
 
         protected abstract void Move();
+        
+        private void OnTriggerEnter(Collider other)
+        {
+            if (other.CompareTag("Enemy"))
+            {
+                other.GetComponent<Enemy>().TakeDamage(damage);
+            }
+            Destroy(gameObject);
+        }
     }
 }

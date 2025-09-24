@@ -7,14 +7,13 @@ namespace _CarXTowerDefense.Scripts.Tower
 {
     public abstract class Tower : MonoBehaviour
     {
-        [SerializeField] protected Transform center;
-        
         [Header("Shooting")]
-        [SerializeField] protected float shootInterval = 1f;
         [SerializeField] protected Transform shootPoint;
+        [SerializeField] protected float shootInterval = 1f;
         [SerializeField] protected float shootRange = 5f;
 
-        [Header("Detection")] 
+        [Header("Detection")]
+        [SerializeField] protected Transform center;
         [SerializeField] protected float detectionRange = 5f;
         [SerializeField] protected float detectionInterval = 0.05f;
         [SerializeField] protected LayerMask enemyLayerMask;
@@ -47,7 +46,7 @@ namespace _CarXTowerDefense.Scripts.Tower
             {
                 _shootTimer -= Time.fixedDeltaTime;
             }
-            else if (Target != null)
+            else if (Target != null && Vector3.Distance(shootPoint.position, Target.position) <= shootRange)
             {
                 Shoot();
                 _shootTimer = shootInterval;
