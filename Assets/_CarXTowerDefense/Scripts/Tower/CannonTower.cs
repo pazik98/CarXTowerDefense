@@ -33,8 +33,7 @@ namespace _CarXTowerDefense.Scripts.Tower
 				return;
 			}
 			
-			var projectile = Instantiate(projectilePrefab, shootPoint.position, shootPoint.rotation); //TODO Pool?
-			projectile.Direction = Vector3.forward;
+			Instantiate(projectilePrefab, shootPoint.position, shootPoint.rotation); //TODO Pool?
 		}
 		
 	}
