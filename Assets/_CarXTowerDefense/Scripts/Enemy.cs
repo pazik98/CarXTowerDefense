@@ -7,6 +7,19 @@ namespace _CarXTowerDefense.Scripts
     {
         [SerializeField] private float maxHealth = 100f;
         [SerializeField] private float health = 100f;
+        [SerializeField] private float speed = 3f;
+        
+        private Rigidbody _rigidbody;
+
+        private void Awake()
+        {
+            _rigidbody = GetComponent<Rigidbody>();
+        }
+
+        void FixedUpdate()
+        {
+            _rigidbody.linearVelocity = transform.TransformDirection(Vector3.forward) * speed;
+        }
 
         public void TakeDamage(float damage)
         {
