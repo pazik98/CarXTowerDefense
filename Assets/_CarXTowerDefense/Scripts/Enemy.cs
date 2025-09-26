@@ -10,6 +10,8 @@ namespace _CarXTowerDefense.Scripts
         [SerializeField] private float speed = 3f;
         
         private Rigidbody _rigidbody;
+        
+        public Vector3 Velocity => _rigidbody.linearVelocity;
 
         private void Awake()
         {

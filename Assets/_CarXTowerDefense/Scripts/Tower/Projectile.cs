@@ -11,6 +11,8 @@ namespace _CarXTowerDefense.Scripts.Tower
         [SerializeField] protected float lifeTime = 5f;
 
         private float _lifeTimer;
+        
+        public float Speed => speed;
 
         private void FixedUpdate()
         {

@@ -28,12 +28,12 @@ namespace _CarXTowerDefense.Scripts.Tower
 
 		protected override void Shoot()
 		{
-			Instantiate(projectilePrefab, shootPoint.position, shootPoint.rotation); //TODO Pool?
+			Instantiate(projectilePrefab, shootPoint.position, shootPoint.rotation); //TODO Pool
 		}
 
 		private void AimTower()
 		{
-			var targetPosition = Target.position;
+			var targetPosition = CalculatePrediction(3);
 			var direction = (targetPosition - shootPoint.position).normalized;
 
 			cannonHubTransform.localRotation = Quaternion.LookRotation(direction);
@@ -41,6 +41,20 @@ namespace _CarXTowerDefense.Scripts.Tower
 			
 			cannonTransform.localRotation = Quaternion.LookRotation(direction);
 			cannonTransform.localEulerAngles = new Vector3(cannonTransform.eulerAngles.x, 0f, 0f);
+		}
+
+		private Vector3 CalculatePrediction(int iterations)
+		{
+			Vector3 predictedPos = Target.transform.position;
+    
+			for (int i = 0; i < iterations; i++)
+			{
+				float distance = Vector3.Distance(shootPoint.position, predictedPos);
+				float timeToTarget = distance / projectilePrefab.Speed;
+				predictedPos = Target.transform.position + Target.Velocity * timeToTarget;
+			}
+    
+			return predictedPos;
 		}
 	}
 }

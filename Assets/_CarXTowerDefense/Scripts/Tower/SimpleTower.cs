@@ -11,7 +11,7 @@ namespace _CarXTowerDefense.Scripts.Tower
 		protected override void Shoot()
 		{
 			var projectile = Instantiate(projectilePrefab, shootPoint.position, Quaternion.identity);
-			projectile.Target = Target;
+			projectile.Target = Target.transform;
 		}
 	}
 }

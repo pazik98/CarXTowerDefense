@@ -15,6 +15,10 @@ namespace _CarXTowerDefense.Scripts.Tower
 				var direction = (Target.position - transform.position).normalized;
 				transform.Translate(direction * (speed * Time.fixedDeltaTime));
 			}
+			else
+			{
+				Destroy(gameObject);
+			}
 		}
 	}
 }
