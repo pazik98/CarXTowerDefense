@@ -14,7 +14,6 @@ namespace _CarXTowerDefense.Scripts.Tower
 
         [Header("Detection")]
         [SerializeField] protected Transform center;
-        [SerializeField] protected float detectionRange = 5f;
         [SerializeField] protected float detectionInterval = 0.05f;
         [SerializeField] protected LayerMask enemyLayerMask;
 
@@ -24,7 +23,8 @@ namespace _CarXTowerDefense.Scripts.Tower
         private float _detectionTimer;
         private float _shootTimer;
 
-        protected virtual bool CanShoot => Vector3.Distance(shootPoint.position, Target.transform.position) <= shootRange;
+        protected virtual bool IsInShootRange => Vector3.Distance(center.position, Target.transform.position) <= shootRange;
+        protected virtual bool CanShoot => IsInShootRange;
 
         private void Start()
         {
@@ -63,9 +63,9 @@ namespace _CarXTowerDefense.Scripts.Tower
         protected virtual void Detect()
         {
             Array.Clear(_detectedCollidersBuffer, 0, _detectedCollidersBuffer.Length);
-            Physics.OverlapSphereNonAlloc(center.position, detectionRange, _detectedCollidersBuffer, enemyLayerMask);
+            Physics.OverlapSphereNonAlloc(center.position, shootRange, _detectedCollidersBuffer, enemyLayerMask);
             
-            if (Target != null && Vector3.Distance(Target.transform.position, center.position) > detectionRange)
+            if (Target != null && Vector3.Distance(Target.transform.position, center.position) > shootRange)
             {
                 OnTargetLost();
             }
@@ -91,9 +91,7 @@ namespace _CarXTowerDefense.Scripts.Tower
         private void OnDrawGizmos()
         {
             Gizmos.color = Color.green;
-            Gizmos.DrawWireSphere(center.position, detectionRange);
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(shootPoint.position, shootRange);
+            Gizmos.DrawWireSphere(center.position, shootRange);
         }
     }
 }

@@ -10,6 +10,7 @@ namespace _CarXTowerDefense.Scripts.Tower
 		[SerializeField] private float rotationSpeed = 1f;
 		[SerializeField] private float maxVerticalRotationAngle = 89f;
 		[SerializeField] private float minVerticalRotationAngle = -89f;
+		[SerializeField] private float verticalAngleStep = 1f;
 		[SerializeField] private float cannonAimTreshold = 0.1f;
 		[SerializeField] private float verticalPredictionTreshold = 0.1f;
 		[SerializeField] private CannonProjectile projectilePrefab;
@@ -44,15 +45,16 @@ namespace _CarXTowerDefense.Scripts.Tower
 		private void RotateTower()
 		{
 			var targetPosition = CalculateHorizontalPrediction(Target.transform.position, 3);
-			var verticalAngleFounded = CalculateVerticalPredictionAngle(targetPosition, 100, out var xAngle);
-			Debug.DrawLine(targetPosition, targetPosition + Vector3.up * 5f, Color.red);
+			var verticalAngleFounded = CalculateVerticalPredictionAngle(
+				targetPosition, 
+				Mathf.RoundToInt(Mathf.Max(Mathf.Abs(minVerticalRotationAngle), Mathf.Abs(maxVerticalRotationAngle)) / verticalAngleStep), 
+				out var xAngle);
+
 			_targetRotation = Quaternion.LookRotation((targetPosition - shootPoint.position).normalized);
 			if (verticalAngleFounded)
 			{
 				_targetRotation.eulerAngles = new Vector3(-xAngle, _targetRotation.eulerAngles.y, 0);
 			}
-			//Debug.Log(_targetRotation.eulerAngles);
-			//Debug.Log($"{Math.Abs(cannonTransform.eulerAngles.y - _targetRotation.eulerAngles.y)} {IsAimed} {CanShoot} {Target}");
 			
 			var cannonHubActualRotation = Quaternion.Slerp(cannonHubTransform.localRotation, _targetRotation, rotationSpeed * Time.fixedDeltaTime);
 			var cannonActualRotation = Quaternion.Slerp(cannonTransform.localRotation, _targetRotation, rotationSpeed * Time.fixedDeltaTime);
@@ -62,8 +64,6 @@ namespace _CarXTowerDefense.Scripts.Tower
 
 			cannonTransform.localRotation = cannonActualRotation;
 			cannonTransform.localEulerAngles = new Vector3(cannonTransform.eulerAngles.x, 0f, 0f);
-			Debug.DrawLine(shootPoint.position, shootPoint.position + shootPoint.forward * 100, Color.red);
-			Debug.DrawLine(shootPoint.position, shootPoint.position + _targetRotation * Vector3.forward * 50f, Color.green);
 		}
 
 		private Vector3 CalculateHorizontalPrediction(Vector3 targetPosition, int iterations)
@@ -110,19 +110,15 @@ namespace _CarXTowerDefense.Scripts.Tower
 	            
 	            if (error < verticalPredictionTreshold)
 	            {
-		            var debugLinePosition = new Vector3(targetPosition.x, predictedHeight, targetPosition.z);
-		            Debug.DrawLine(debugLinePosition, debugLinePosition + Vector3.up, Color.red);
-		            Debug.DrawLine(debugLinePosition, debugLinePosition + Vector3.left, Color.red);
 	                predictionAngle = bestAngle;
-	                Debug.Log($"angle: {bestAngle} error: {error} predicted height: {predictedHeight} ite: {i}");
 	                return true;
 	            }
 	            
 	            // Correction
 	            if (predictedHeight < targetPosition.y)
-	                angle += 1;
+	                angle += verticalAngleStep;
 	            else
-	                angle -= 1f;
+	                angle -= verticalAngleStep;
 	                
 	            if (angle > maxVerticalRotationAngle) angle = maxVerticalRotationAngle;
 	            if (angle < minVerticalRotationAngle) angle = minVerticalRotationAngle;
