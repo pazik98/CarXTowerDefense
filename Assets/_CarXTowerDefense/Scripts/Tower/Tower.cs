@@ -87,11 +87,5 @@ namespace _CarXTowerDefense.Scripts.Tower
         {
             Target = null;
         }
-
-        private void OnDrawGizmos()
-        {
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireSphere(center.position, shootRange);
-        }
     }
 }
