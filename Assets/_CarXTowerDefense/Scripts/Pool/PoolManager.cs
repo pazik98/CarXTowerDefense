@@ -7,10 +7,12 @@ namespace _CarXTowerDefense.Scripts.Pool
     {
         [SerializeField] private CannonProjectilePool cannonProjectilePool;
         [SerializeField] private GuidedProjectilePool guidedProjectilePool;
+        [SerializeField] private EnemyPool enemyPool;
         
         public static PoolManager Instance { get; private set; }
         public CannonProjectilePool CannonProjectilePool => cannonProjectilePool;
         public GuidedProjectilePool GuidedProjectilePool => guidedProjectilePool;
+        public EnemyPool EnemyPool => enemyPool;
 
         private void Awake()
         {

@@ -9,7 +9,7 @@ namespace _CarXTowerDefense.Scripts.Tower
 
 		public Transform Target { get; set; }
 
-		protected override IObjectPool Pool => PoolManager.Instance.GuidedProjectilePool;
+		public override IObjectPool Pool => PoolManager.Instance.GuidedProjectilePool;
 
 		protected override void Move()
 		{

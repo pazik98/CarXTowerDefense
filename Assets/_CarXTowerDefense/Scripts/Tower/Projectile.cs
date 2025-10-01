@@ -15,7 +15,7 @@ namespace _CarXTowerDefense.Scripts.Tower
         
         public float Speed => speed;
         
-        protected abstract IObjectPool Pool { get; }
+        public abstract IObjectPool Pool { get; }
     
         private void FixedUpdate()
         {

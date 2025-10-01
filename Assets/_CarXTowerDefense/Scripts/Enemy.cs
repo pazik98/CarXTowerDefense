@@ -1,9 +1,10 @@
 using System;
+using _CarXTowerDefense.Scripts.Pool;
 using UnityEngine;
 
 namespace _CarXTowerDefense.Scripts
 {
-    public class Enemy : MonoBehaviour
+    public class Enemy : MonoBehaviour, IPoolable
     {
         [SerializeField] private float maxHealth = 100f;
         [SerializeField] private float health = 100f;
@@ -38,6 +39,23 @@ namespace _CarXTowerDefense.Scripts
             {
                 Destroy(gameObject);
             }
+        }
+
+        public IObjectPool Pool => PoolManager.Instance.EnemyPool;
+
+        public void Spawn(Vector3 position, Quaternion rotation)
+        {
+            transform.position = position;
+            transform.rotation = rotation;
+            gameObject.SetActive(true);
+        }
+
+        public void Despawn()
+        {
+            gameObject.SetActive(false);
+            health = maxHealth;
+            _lifeTimer = 0f;
+            Pool.Return(this);
         }
     }
 }

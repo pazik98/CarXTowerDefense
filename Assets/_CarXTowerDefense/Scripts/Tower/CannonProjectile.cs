@@ -11,7 +11,7 @@ namespace _CarXTowerDefense.Scripts.Tower
         
         public float Gravity => gravity;
 
-        protected override IObjectPool Pool => PoolManager.Instance.CannonProjectilePool;
+        public override IObjectPool Pool => PoolManager.Instance.CannonProjectilePool;
 
         protected override void Move()
         {

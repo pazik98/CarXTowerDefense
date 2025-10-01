@@ -22,7 +22,7 @@ namespace _CarXTowerDefense.Scripts.Pool
 
         private T Create()
         {
-            var obj = Instantiate(prefab);
+            var obj = Instantiate(prefab, transform);
             obj.gameObject.SetActive(false);
             return obj;
         }

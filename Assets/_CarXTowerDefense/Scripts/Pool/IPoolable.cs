@@ -6,6 +6,8 @@ namespace _CarXTowerDefense.Scripts.Pool
 {
     public interface IPoolable
     {
+        IObjectPool Pool { get; }
+        
         void Spawn(Vector3 position, Quaternion rotation);
         void Despawn();
     }
