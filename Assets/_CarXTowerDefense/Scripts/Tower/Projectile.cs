@@ -1,10 +1,11 @@
 using System;
+using _CarXTowerDefense.Scripts.Pool;
 using UnityEngine;
 
 namespace _CarXTowerDefense.Scripts.Tower
 {
     [RequireComponent(typeof(Collider))]
-    public abstract class Projectile : MonoBehaviour
+    public abstract class Projectile : MonoBehaviour, IPoolable
     {
         [SerializeField] protected float speed = 0.1f;
         [SerializeField] protected float damage = 10f;
@@ -13,13 +14,15 @@ namespace _CarXTowerDefense.Scripts.Tower
         private float _lifeTimer;
         
         public float Speed => speed;
-
+        
+        protected abstract IObjectPool Pool { get; }
+    
         private void FixedUpdate()
         {
             Move();
             if (_lifeTimer > lifeTime)
             {
-                Destroy(gameObject);
+                Despawn();
             }
             else
             {
@@ -35,7 +38,20 @@ namespace _CarXTowerDefense.Scripts.Tower
             {
                 other.GetComponent<Enemy>().TakeDamage(damage);
             }
-            Destroy(gameObject);
+            Despawn();
+        }
+
+        public virtual void Spawn(Vector3 position, Quaternion rotation)
+        {
+            transform.position = position;
+            transform.rotation = rotation;
+            gameObject.SetActive(true);
+        }
+
+        public virtual void Despawn()
+        {
+            gameObject.SetActive(false);
+            Pool.Return(this);
         }
     }
 }

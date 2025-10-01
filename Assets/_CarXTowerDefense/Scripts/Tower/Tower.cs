@@ -26,7 +26,7 @@ namespace _CarXTowerDefense.Scripts.Tower
         protected virtual bool IsInShootRange => Vector3.Distance(center.position, Target.transform.position) <= shootRange;
         protected virtual bool CanShoot => IsInShootRange;
 
-        private void Start()
+        protected virtual void Start()
         {
             _detectionTimer = detectionInterval;
             _shootTimer = shootInterval;

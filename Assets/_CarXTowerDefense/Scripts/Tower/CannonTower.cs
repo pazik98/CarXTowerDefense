@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections;
+using _CarXTowerDefense.Scripts.Pool;
 
 namespace _CarXTowerDefense.Scripts.Tower
 {
@@ -17,11 +18,18 @@ namespace _CarXTowerDefense.Scripts.Tower
 		[SerializeField] private Transform cannonHubTransform;
 		[SerializeField] private Transform cannonTransform;
 
+		private CannonProjectilePool _cannonProjectilePool;
 		private Quaternion _targetRotation;
 		
 		protected override bool CanShoot => base.CanShoot && IsAimed;
 		
 		protected virtual bool IsAimed => Math.Abs(cannonTransform.eulerAngles.y - _targetRotation.eulerAngles.y) < cannonAimTreshold;
+
+		protected override void Start()
+		{
+			base.Start();
+			_cannonProjectilePool = PoolManager.Instance.CannonProjectilePool;
+		}
 
 		protected override void Tick()
 		{
@@ -33,7 +41,7 @@ namespace _CarXTowerDefense.Scripts.Tower
 
 		protected override void Shoot()
 		{
-			Instantiate(projectilePrefab, shootPoint.position, shootPoint.rotation); //TODO Pool
+			_cannonProjectilePool.Get(shootPoint.position, shootPoint.rotation);
 		}
 
 		protected override void OnTargetDetected(Enemy enemy)

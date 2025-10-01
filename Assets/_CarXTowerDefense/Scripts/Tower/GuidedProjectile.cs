@@ -1,13 +1,16 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections;
+using _CarXTowerDefense.Scripts.Pool;
 
 namespace _CarXTowerDefense.Scripts.Tower
 {
 	public class GuidedProjectile : Projectile {
-		
-		[NonSerialized] public Transform Target;
-		
+
+		public Transform Target { get; set; }
+
+		protected override IObjectPool Pool => PoolManager.Instance.GuidedProjectilePool;
+
 		protected override void Move()
 		{
 			if (Target != null)

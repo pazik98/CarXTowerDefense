@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using _CarXTowerDefense.Scripts.Pool;
 using _CarXTowerDefense.Scripts.Tower;
 
 namespace _CarXTowerDefense.Scripts.Tower
@@ -9,7 +10,9 @@ namespace _CarXTowerDefense.Scripts.Tower
         [SerializeField] protected float gravity = 9.8f;
         
         public float Gravity => gravity;
-        
+
+        protected override IObjectPool Pool => PoolManager.Instance.CannonProjectilePool;
+
         protected override void Move()
         {
             var horizontalVector = Vector3.forward * (speed * Time.fixedDeltaTime);
