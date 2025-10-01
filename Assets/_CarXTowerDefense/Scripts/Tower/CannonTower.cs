@@ -7,23 +7,27 @@ namespace _CarXTowerDefense.Scripts.Tower
 	public class CannonTower : Tower {
 		
 		[Header("Cannon")]
+		[SerializeField] private float rotationSpeed = 1f;
+		[SerializeField] private float maxVerticalRotationAngle = 89f;
+		[SerializeField] private float minVerticalRotationAngle = -89f;
+		[SerializeField] private float cannonAimTreshold = 0.1f;
+		[SerializeField] private float verticalPredictionTreshold = 0.1f;
 		[SerializeField] private CannonProjectile projectilePrefab;
 		[SerializeField] private Transform cannonHubTransform;
 		[SerializeField] private Transform cannonTransform;
 
-		private bool _isAimed;
+		private Quaternion _targetRotation;
 		
-		protected override bool CanShoot => base.CanShoot && _isAimed;
+		protected override bool CanShoot => base.CanShoot && IsAimed;
+		
+		protected virtual bool IsAimed => Math.Abs(cannonTransform.eulerAngles.y - _targetRotation.eulerAngles.y) < cannonAimTreshold;
 
-		private void Update()
+		protected override void Tick()
 		{
-			_isAimed = false;
+			if (Target != null)
+				RotateTower();
 			
-			if (Target == null)
-				return;
-			
-			AimTower();
-			_isAimed = true;
+			base.Tick();
 		}
 
 		protected override void Shoot()
@@ -31,21 +35,40 @@ namespace _CarXTowerDefense.Scripts.Tower
 			Instantiate(projectilePrefab, shootPoint.position, shootPoint.rotation); //TODO Pool
 		}
 
-		private void AimTower()
+		protected override void OnTargetDetected(Enemy enemy)
 		{
-			var targetPosition = CalculatePrediction(3);
-			var direction = (targetPosition - shootPoint.position).normalized;
-
-			cannonHubTransform.localRotation = Quaternion.LookRotation(direction);
-			cannonHubTransform.localEulerAngles = new Vector3(0f, cannonHubTransform.eulerAngles.y, 0f);
-			
-			cannonTransform.localRotation = Quaternion.LookRotation(direction);
-			cannonTransform.localEulerAngles = new Vector3(cannonTransform.eulerAngles.x, 0f, 0f);
+			base.OnTargetDetected(enemy);
+			_targetRotation = Quaternion.LookRotation((enemy.transform.position - shootPoint.position).normalized);
 		}
 
-		private Vector3 CalculatePrediction(int iterations)
+		private void RotateTower()
 		{
-			Vector3 predictedPos = Target.transform.position;
+			var targetPosition = CalculateHorizontalPrediction(Target.transform.position, 3);
+			var verticalAngleFounded = CalculateVerticalPredictionAngle(targetPosition, 100, out var xAngle);
+			Debug.DrawLine(targetPosition, targetPosition + Vector3.up * 5f, Color.red);
+			_targetRotation = Quaternion.LookRotation((targetPosition - shootPoint.position).normalized);
+			if (verticalAngleFounded)
+			{
+				_targetRotation.eulerAngles = new Vector3(-xAngle, _targetRotation.eulerAngles.y, 0);
+			}
+			//Debug.Log(_targetRotation.eulerAngles);
+			//Debug.Log($"{Math.Abs(cannonTransform.eulerAngles.y - _targetRotation.eulerAngles.y)} {IsAimed} {CanShoot} {Target}");
+			
+			var cannonHubActualRotation = Quaternion.Slerp(cannonHubTransform.localRotation, _targetRotation, rotationSpeed * Time.fixedDeltaTime);
+			var cannonActualRotation = Quaternion.Slerp(cannonTransform.localRotation, _targetRotation, rotationSpeed * Time.fixedDeltaTime);
+			
+			cannonHubTransform.localRotation = cannonHubActualRotation;
+			cannonHubTransform.localEulerAngles = new Vector3(0f, cannonHubTransform.eulerAngles.y, 0f);
+
+			cannonTransform.localRotation = cannonActualRotation;
+			cannonTransform.localEulerAngles = new Vector3(cannonTransform.eulerAngles.x, 0f, 0f);
+			Debug.DrawLine(shootPoint.position, shootPoint.position + shootPoint.forward * 100, Color.red);
+			Debug.DrawLine(shootPoint.position, shootPoint.position + _targetRotation * Vector3.forward * 50f, Color.green);
+		}
+
+		private Vector3 CalculateHorizontalPrediction(Vector3 targetPosition, int iterations)
+		{
+			Vector3 predictedPos = targetPosition;
     
 			for (int i = 0; i < iterations; i++)
 			{
@@ -56,6 +79,57 @@ namespace _CarXTowerDefense.Scripts.Tower
     
 			return predictedPos;
 		}
+
+		private bool CalculateVerticalPredictionAngle(Vector3 targetPosition, int iterations, out float predictionAngle)
+		{
+			predictionAngle = 45f;
+			Vector3 startPosition = shootPoint.position;
+	        float distance = Vector3.Distance(startPosition, targetPosition);	
+	        
+	        // Start prediction
+	        float angle = 0f;
+	        float bestAngle = angle;
+	        float bestError = float.MaxValue;
+	        
+	        for (int i = 0; i < iterations; i++)
+	        {
+	            float angleRad = angle * Mathf.Deg2Rad;
+	            float horizontalSpeed = projectilePrefab.Speed * Mathf.Cos(angleRad);
+	            float verticalSpeed = projectilePrefab.Speed * Mathf.Sin(angleRad);
+	            
+	            float timeToTarget = distance / horizontalSpeed;
+	            
+	            float predictedHeight = startPosition.y + verticalSpeed * timeToTarget - 0.5f * projectilePrefab.Gravity * timeToTarget * timeToTarget;
+	            float error = Mathf.Abs(predictedHeight - targetPosition.y);
+	            
+	            if (error < bestError)
+	            {
+	                bestError = error;
+	                bestAngle = angle;
+	            }
+	            
+	            if (error < verticalPredictionTreshold)
+	            {
+		            var debugLinePosition = new Vector3(targetPosition.x, predictedHeight, targetPosition.z);
+		            Debug.DrawLine(debugLinePosition, debugLinePosition + Vector3.up, Color.red);
+		            Debug.DrawLine(debugLinePosition, debugLinePosition + Vector3.left, Color.red);
+	                predictionAngle = bestAngle;
+	                Debug.Log($"angle: {bestAngle} error: {error} predicted height: {predictedHeight} ite: {i}");
+	                return true;
+	            }
+	            
+	            // Correction
+	            if (predictedHeight < targetPosition.y)
+	                angle += 1;
+	            else
+	                angle -= 1f;
+	                
+	            if (angle > maxVerticalRotationAngle) angle = maxVerticalRotationAngle;
+	            if (angle < minVerticalRotationAngle) angle = minVerticalRotationAngle;
+	        }
+	        
+	        return false;
+	    }
 	}
 }
 

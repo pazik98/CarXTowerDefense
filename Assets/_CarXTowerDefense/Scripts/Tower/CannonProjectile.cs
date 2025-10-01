@@ -6,9 +6,16 @@ namespace _CarXTowerDefense.Scripts.Tower
 {
     public class CannonProjectile : Projectile
     {
+        [SerializeField] protected float gravity = 9.8f;
+        
+        public float Gravity => gravity;
+        
         protected override void Move()
         {
-            transform.Translate(Vector3.forward * (speed * Time.fixedDeltaTime), Space.Self);
+            var horizontalVector = Vector3.forward * (speed * Time.fixedDeltaTime);
+            transform.Translate(horizontalVector, Space.Self);
+            var verticalVector = Vector3.down * (gravity * Time.fixedDeltaTime);
+            transform.Translate(verticalVector, Space.World);
         }
     }
 }

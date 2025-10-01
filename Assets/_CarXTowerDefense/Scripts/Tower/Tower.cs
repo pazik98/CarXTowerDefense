@@ -34,6 +34,11 @@ namespace _CarXTowerDefense.Scripts.Tower
 
         private void FixedUpdate()
         {
+            Tick();
+        }
+
+        protected virtual void Tick()
+        {
             if (_detectionTimer > 0)
             {
                 _detectionTimer -= Time.fixedDeltaTime;
@@ -62,15 +67,33 @@ namespace _CarXTowerDefense.Scripts.Tower
             
             if (Target != null && Vector3.Distance(Target.transform.position, center.position) > detectionRange)
             {
-                Target = null;
+                OnTargetLost();
             }
             
             if (Target == null && _detectedCollidersBuffer[0] != null)
             {
-                Target = _detectedCollidersBuffer[0].GetComponent<Enemy>();
+                OnTargetDetected(_detectedCollidersBuffer[0].GetComponent<Enemy>());
             }
         }
-        
+
         protected abstract void Shoot();
+
+        protected virtual void OnTargetDetected(Enemy enemy)
+        {
+            Target = enemy;
+        }
+
+        protected virtual void OnTargetLost()
+        {
+            Target = null;
+        }
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireSphere(center.position, detectionRange);
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(shootPoint.position, shootRange);
+        }
     }
 }
