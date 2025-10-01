@@ -5,7 +5,7 @@ using _CarXTowerDefense.Scripts.Tower;
 
 namespace _CarXTowerDefense.Scripts.Tower
 {
-	public class SimpleTower : Tower 
+	public class CrystalTower : Tower 
 	{
 		[SerializeField] private GuidedProjectile projectilePrefab;
 
