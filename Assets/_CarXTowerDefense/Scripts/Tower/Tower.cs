@@ -1,7 +1,5 @@
 using System;
-using R3;
 using UnityEngine;
-using Zenject;
 
 namespace _CarXTowerDefense.Scripts.Tower
 {
